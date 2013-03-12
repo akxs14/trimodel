@@ -11,6 +11,7 @@ Gem::Specification.new do |s|
   s.email       = "angelos.kapsimanis@gmail.com"
   s.files       = ["trimodel.rb", 
                    "lib/trimodel/engine.rb",
-                   "lib/generators/trimodel/new_generator.rb"]
+                   "lib/generators/trimodel/new_generator.rb",
+                   "lib/generators/trimodel/delete_generator.rb"]
   s.homepage    = "https://github.com/akxs14/trimodel"
 end
