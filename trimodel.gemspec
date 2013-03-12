@@ -7,8 +7,10 @@ Gem::Specification.new do |s|
       A gem that enables transparent relationships 
       between 2 models associated through a third one.
     eos
-  s.authors     = ["Angelos"]
+  s.authors     = ["Angelos Kapsimanis"]
   s.email       = "angelos.kapsimanis@gmail.com"
-  s.files       = ["lib/trimodel.rb"]
+  s.files       = ["trimodel.rb", 
+                   "lib/trimodel/engine.rb",
+                   "lib/generators/trimodel/new_generator.rb"]
   s.homepage    = "https://github.com/akxs14/trimodel"
 end
