@@ -1,0 +1,14 @@
+Gem::Specification.new do |s|
+  s.name        = "trimodel"
+  s.version     = "0.0.1"
+  s.date        = "2013-03-12"
+  s.summary     = "A negotiator between 3 models"
+  s.description = <<-eos
+      A gem that enables transparent relationships 
+      between 2 models associated through a third one.
+    eos
+  s.authors     = ["Angelos"]
+  s.email       = "angelos.kapsimanis@gmail.com"
+  s.files       = ["lib/trimodel.rb"]
+  s.homepage    = "https://github.com/akxs14/trimodel"
+end

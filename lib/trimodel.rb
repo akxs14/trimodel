@@ -1,0 +1,3 @@
+class Trimodel
+
+end
