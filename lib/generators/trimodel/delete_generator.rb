@@ -20,7 +20,7 @@ module Trimodel
       File.delete(Rails.root + "app/controllers/trimodel_application_controller.rb")
     end
 
-    def delete_join_tables
+    def rollback_migrations
     end
 
     def delete_migration_files

@@ -43,12 +43,15 @@ eos
       end
     end
 
-    def create_join_tables
+    def create_migration_files
       create_migration_file options[:models][0], options[:models][1]
       #need to wait so the timestamp has a different value
       #and forms a correct migration file name
       sleep(1)
       create_migration_file options[:models][1], options[:models][2]
+    end
+
+    def perform_migrations
     end
 
     #create lib/trimodel.rb and where you open classes
