@@ -1,5 +1,6 @@
 require 'rails/generators'
 require 'active_support/inflector'
+require 'rake'
 
 module Trimodel
   class NewGenerator < Rails::Generators::Base
@@ -25,17 +26,17 @@ module Trimodel
 class ApplicationController < ActionController::Base
   RELOAD_LIBS = Dir[Rails.root + 'lib/trimodel.rb'] if Rails.env.development?
   before_filter :_reload_libs, :if => :_reload_libs?
-  
+
   def _reload_libs
     RELOAD_LIBS.each do |lib|
       require_dependency lib
     end
   end
- 
+
   def _reload_libs?
     defined? RELOAD_LIBS
   end
-end              
+end
 eos
       File.open(Rails.root + "app/controllers/trimodel_application_controller.rb",
         File::CREAT|File::RDWR) do |fi|
@@ -52,6 +53,7 @@ eos
     end
 
     def perform_migrations
+      %x[rake db:migrate]
     end
 
     #create lib/trimodel.rb and where you open classes
