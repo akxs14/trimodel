@@ -18,16 +18,6 @@ module Trimodel
       end
     end
 
-    #create app/controllers/trimodel_application_controller.rb 
-    #where the automatic load of lib/trimodel.rb is added
-    #in development mode
-    # def enable_lib_autoloading
-    #   File.open(Rails.root + "app/controllers/trimodel_application_controller.rb",
-    #     File::CREAT|File::RDWR) do |fi|
-    #     fi.write(write_autoload_code)
-    #   end
-    # end
-
     def create_migration_files
       create_migration_file options[:models][0], options[:models][1]
       #need to wait so the timestamp has a different value
@@ -92,26 +82,6 @@ module Trimodel
       def create_timestamp
         Time.now.utc.to_s.gsub('-','').gsub(':','').gsub(' ','')[0..-4]
       end
-
-#       def write_autoload_code
-#         code= <<-eos
-# class ApplicationController < ActionController::Base
-#   RELOAD_LIBS = Dir[Rails.root + 'lib/trimodel.rb'] if Rails.env.development?
-#   before_filter :_reload_libs, :if => :_reload_libs?
-
-#   def _reload_libs
-#     RELOAD_LIBS.each do |lib|
-#       require_dependency lib
-#     end
-#   end
-
-#   def _reload_libs?
-#     defined? RELOAD_LIBS
-#   end
-# end
-# eos
-#         code
-#       end
 
       def write_migration_code model_a, model_b
         code=<<-eos

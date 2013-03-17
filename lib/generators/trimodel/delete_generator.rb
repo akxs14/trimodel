@@ -16,10 +16,6 @@ module Trimodel
       end
     end
 
-    def disable_lib_autoloading
-      File.delete(Rails.root + "app/controllers/trimodel_application_controller.rb")
-    end
-
     def rollback_migrations
       list_and_perform_on_files options[:models][0], options[:models][1] { |f,a,b| rollback_migration(f,a,b) }
       list_and_perform_on_files options[:models][1], options[:models][2] { |f,a,b| rollback_migration(f,a,b) }
