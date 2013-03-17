@@ -21,12 +21,12 @@ module Trimodel
     #create app/controllers/trimodel_application_controller.rb 
     #where the automatic load of lib/trimodel.rb is added
     #in development mode
-    def enable_lib_autoloading
-      File.open(Rails.root + "app/controllers/trimodel_application_controller.rb",
-        File::CREAT|File::RDWR) do |fi|
-        fi.write(write_autoload_code)
-      end
-    end
+    # def enable_lib_autoloading
+    #   File.open(Rails.root + "app/controllers/trimodel_application_controller.rb",
+    #     File::CREAT|File::RDWR) do |fi|
+    #     fi.write(write_autoload_code)
+    #   end
+    # end
 
     def create_migration_files
       create_migration_file options[:models][0], options[:models][1]
@@ -41,7 +41,7 @@ module Trimodel
     end
 
     def create_trimodel_file
-      File.open(Rails.root + "lib/trimodel.rb",
+      File.open(Rails.root + "config/initializers/trimodel.rb",
         File::CREAT|File::RDWR) do |f|
           add_one_asoc_to_model f, options[:models][0], options[:models][1]
           add_two_asocs_to_model f, options[:models][1], options[:models][0], options[:models][2]
@@ -71,8 +71,12 @@ module Trimodel
         "  has_and_belongs_to_many :#{model_b.pluralize.downcase}\n"
       end
 
+      def add_iterator_method bridge_model, target_model
+
+      end
+
       def add_end
-        "end\n\n"
+        "end\n"
       end
 
       def create_migration_file model_a, model_b
@@ -89,25 +93,25 @@ module Trimodel
         Time.now.utc.to_s.gsub('-','').gsub(':','').gsub(' ','')[0..-4]
       end
 
-      def write_autoload_code
-        code= <<-eos
-class ApplicationController < ActionController::Base
-  RELOAD_LIBS = Dir[Rails.root + 'lib/trimodel.rb'] if Rails.env.development?
-  before_filter :_reload_libs, :if => :_reload_libs?
+#       def write_autoload_code
+#         code= <<-eos
+# class ApplicationController < ActionController::Base
+#   RELOAD_LIBS = Dir[Rails.root + 'lib/trimodel.rb'] if Rails.env.development?
+#   before_filter :_reload_libs, :if => :_reload_libs?
 
-  def _reload_libs
-    RELOAD_LIBS.each do |lib|
-      require_dependency lib
-    end
-  end
+#   def _reload_libs
+#     RELOAD_LIBS.each do |lib|
+#       require_dependency lib
+#     end
+#   end
 
-  def _reload_libs?
-    defined? RELOAD_LIBS
-  end
-end
-eos
-        code
-      end
+#   def _reload_libs?
+#     defined? RELOAD_LIBS
+#   end
+# end
+# eos
+#         code
+#       end
 
       def write_migration_code model_a, model_b
         code=<<-eos
