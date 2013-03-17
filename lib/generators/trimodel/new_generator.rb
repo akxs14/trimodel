@@ -56,19 +56,37 @@ eos
       %x[rake db:migrate]
     end
 
-    #create lib/trimodel.rb and where you open classes
-    #add the new associations and any other needed method
     def create_trimodel_file
       File.open(Rails.root + "app/models/trimodel.rb",
         File::CREAT|File::RDWR) do |f|
-          f.write("hello")
+          f.write(create_class_definition(options[:models][0]))
+          f.write(add_n_to_n_association(options[:models][1]))
+          f.write(add_end)
+
+          f.write(create_class_definition(options[:models][1]))
+          f.write(add_n_to_n_association(options[:models][0]))
+          f.write(add_n_to_n_association(options[:models][2]))
+          f.write(add_end)
+
+          f.write(create_class_definition(options[:models][2]))
+          f.write(add_n_to_n_association(options[:models][1]))
+          f.write(add_end)
       end
     end
 
-    def create_model_associations
-    end
-
     private
+      def create_class_definition model
+        "class #{model} < ActiveRecord::Base"
+      end
+
+      def add_n_to_n_association model_b
+        "  has_and_belongs_to_many :#{model_b.pluralize.downcase}"
+      end
+
+      def add_end
+        "end"
+      end
+
       def create_migration_file model_a, model_b
         path = Rails.root.to_s
         path << "/db/migrate/#{create_timestamp}_"
