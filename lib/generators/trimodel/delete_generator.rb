@@ -25,10 +25,11 @@ module Trimodel
 
     def delete_migration_files
       list_and_delete_files options[:models][0], options[:models][1]
-      list_and_delete_files options[:models][1], options[:models][2]      
+      list_and_delete_files options[:models][1], options[:models][2]
     end
 
     def delete_trimodel_file
+      File.delete(Rails.root + "app/models/trimodel.rb")
     end
 
     private

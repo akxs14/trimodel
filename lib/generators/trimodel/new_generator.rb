@@ -59,6 +59,10 @@ eos
     #create lib/trimodel.rb and where you open classes
     #add the new associations and any other needed method
     def create_trimodel_file
+      File.open(Rails.root + "app/models/trimodel.rb",
+        File::CREAT|File::RDWR) do |f|
+          f.write("hello")
+      end
     end
 
     def create_model_associations
