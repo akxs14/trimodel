@@ -22,25 +22,9 @@ module Trimodel
     #where the automatic load of lib/trimodel.rb is added
     #in development mode
     def enable_lib_autoloading
-      code= <<-eos
-class ApplicationController < ActionController::Base
-  RELOAD_LIBS = Dir[Rails.root + 'lib/trimodel.rb'] if Rails.env.development?
-  before_filter :_reload_libs, :if => :_reload_libs?
-
-  def _reload_libs
-    RELOAD_LIBS.each do |lib|
-      require_dependency lib
-    end
-  end
-
-  def _reload_libs?
-    defined? RELOAD_LIBS
-  end
-end
-eos
       File.open(Rails.root + "app/controllers/trimodel_application_controller.rb",
         File::CREAT|File::RDWR) do |fi|
-        fi.write(code)
+        fi.write(write_autoload_code)
       end
     end
 
@@ -57,34 +41,38 @@ eos
     end
 
     def create_trimodel_file
-      File.open(Rails.root + "app/models/trimodel.rb",
+      File.open(Rails.root + "lib/trimodel.rb",
         File::CREAT|File::RDWR) do |f|
-          f.write(create_class_definition(options[:models][0]))
-          f.write(add_n_to_n_association(options[:models][1]))
-          f.write(add_end)
-
-          f.write(create_class_definition(options[:models][1]))
-          f.write(add_n_to_n_association(options[:models][0]))
-          f.write(add_n_to_n_association(options[:models][2]))
-          f.write(add_end)
-
-          f.write(create_class_definition(options[:models][2]))
-          f.write(add_n_to_n_association(options[:models][1]))
-          f.write(add_end)
+          add_one_asoc_to_model f, options[:models][0], options[:models][1]
+          add_two_asocs_to_model f, options[:models][1], options[:models][0], options[:models][2]
+          add_one_asoc_to_model f, options[:models][2], options[:models][1]
       end
     end
 
     private
+      def add_one_asoc_to_model file, model_a, model_b
+        file.write(create_class_definition(model_a))
+        file.write(add_n_to_n_association(model_b))
+        file.write(add_end)
+      end
+
+      def add_two_asocs_to_model file, model_a, model_b, model_c
+        file.write(create_class_definition(model_a))
+        file.write(add_n_to_n_association(model_b))
+        file.write(add_n_to_n_association(model_c))
+        file.write(add_end)
+      end
+
       def create_class_definition model
-        "class #{model} < ActiveRecord::Base"
+        "class #{model} < ActiveRecord::Base\n"
       end
 
       def add_n_to_n_association model_b
-        "  has_and_belongs_to_many :#{model_b.pluralize.downcase}"
+        "  has_and_belongs_to_many :#{model_b.pluralize.downcase}\n"
       end
 
       def add_end
-        "end"
+        "end\n\n"
       end
 
       def create_migration_file model_a, model_b
@@ -99,6 +87,26 @@ eos
 
       def create_timestamp
         Time.now.utc.to_s.gsub('-','').gsub(':','').gsub(' ','')[0..-4]
+      end
+
+      def write_autoload_code
+        code= <<-eos
+class ApplicationController < ActionController::Base
+  RELOAD_LIBS = Dir[Rails.root + 'lib/trimodel.rb'] if Rails.env.development?
+  before_filter :_reload_libs, :if => :_reload_libs?
+
+  def _reload_libs
+    RELOAD_LIBS.each do |lib|
+      require_dependency lib
+    end
+  end
+
+  def _reload_libs?
+    defined? RELOAD_LIBS
+  end
+end
+eos
+        code
       end
 
       def write_migration_code model_a, model_b
