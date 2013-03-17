@@ -21,11 +21,13 @@ module Trimodel
     end
 
     def rollback_migrations
+      list_and_perform_on_files options[:models][0], options[:models][1] { |f,a,b| rollback_migration(f,a,b) }
+      list_and_perform_on_files options[:models][1], options[:models][2] { |f,a,b| rollback_migration(f,a,b) }
     end
 
     def delete_migration_files
-      list_and_delete_files options[:models][0], options[:models][1]
-      list_and_delete_files options[:models][1], options[:models][2]
+      list_and_perform_on_files options[:models][0], options[:models][1] { |f,a,b| delete_migration_file(f,a,b) }
+      list_and_perform_on_files options[:models][1], options[:models][2] { |f,a,b| delete_migration_file(f,a,b) }
     end
 
     def delete_trimodel_file
@@ -33,10 +35,10 @@ module Trimodel
     end
 
     private
-      def list_and_delete_files model_a, model_b
+      def list_and_perform_on_files model_a, model_b
         migration_files = Dir.entries(Rails.root + "db/migrate")
         for file in migration_files
-          delete_migration_file file, model_a, model_b
+          yield(file, model_a, model_b)
         end
       end
 
@@ -44,6 +46,12 @@ module Trimodel
         if /_create_#{model_a.pluralize.downcase}_#{model_b.pluralize.downcase}_trimodel/ =~ file
           full_path = Rails.root.to_s + "/db/migrate/" + file
           File.delete(full_path)
+        end
+      end
+
+      def rollback_migration file, model_a, model_b
+        if /_create_#{model_a.pluralize.downcase}_#{model_b.pluralize.downcase}_trimodel/ =~ file
+          %x[rake db:migrate:down VERSION=#{file[0,14]}]
         end
       end
   end
