@@ -33,23 +33,24 @@ module Trimodel
     def create_trimodel_file
       File.open(Rails.root + "config/initializers/trimodel.rb",
         File::CREAT|File::RDWR) do |f|
-          add_one_asoc_to_model f, options[:models][0], options[:models][1]
+          add_one_asoc_to_model f, options[:models][0], options[:models][1], options[:models][2]
           add_two_asocs_to_model f, options[:models][1], options[:models][0], options[:models][2]
-          add_one_asoc_to_model f, options[:models][2], options[:models][1]
+          add_one_asoc_to_model f, options[:models][2], options[:models][1], options[:models][0]
       end
     end
 
     private
-      def add_one_asoc_to_model file, model_a, model_b
+      def add_one_asoc_to_model file, model_a, model_b, model_c
         file.write(create_class_definition(model_a))
-        file.write(add_n_to_n_association(model_b))
+        file.write(add_n_to_n_association(model_a, model_b))
+        file.write(add_iterator_method(model_b, model_c))
         file.write(add_end)
       end
 
       def add_two_asocs_to_model file, model_a, model_b, model_c
         file.write(create_class_definition(model_a))
-        file.write(add_n_to_n_association(model_b))
-        file.write(add_n_to_n_association(model_c))
+        file.write(add_n_to_n_association(model_a, model_b))
+        file.write(add_n_to_n_association(model_a, model_c))
         file.write(add_end)
       end
 
@@ -57,16 +58,26 @@ module Trimodel
         "class #{model} < ActiveRecord::Base\n"
       end
 
-      def add_n_to_n_association model_b
+      def add_n_to_n_association model_a, model_b
         "  has_and_belongs_to_many :#{model_b.pluralize.downcase}\n"
       end
 
       def add_iterator_method bridge_model, target_model
+        method_body=<<-eos
 
+  def #{target_model.pluralize.downcase}
+    records = []
+    self.#{bridge_model.pluralize.downcase}.each do |bm|
+      records << bm.#{target_model.pluralize.downcase}.map { |obj| obj }
+    end
+    records.flatten
+  end
+eos
+        method_body
       end
 
       def add_end
-        "end\n"
+        "end\n\n"
       end
 
       def create_migration_file model_a, model_b
@@ -84,17 +95,22 @@ module Trimodel
       end
 
       def write_migration_code model_a, model_b
+        if (model_a.pluralize.downcase[0] < model_b.pluralize.downcase)
+          first, second = model_a.pluralize.downcase, model_b.pluralize.downcase
+        else
+          first, second = model_b.pluralize.downcase, model_a.pluralize.downcase
+        end
         code=<<-eos
 class Create#{model_a.pluralize}#{model_b.pluralize}TrimodelJoinTable < ActiveRecord::Migration
   def self.up
-    create_table :#{model_a.pluralize.downcase}_#{model_b.pluralize.downcase}, :id => false do |t|
+    create_table :#{first}_#{second}, :id => false do |t|
       t.integer :#{model_a.downcase}_id
       t.integer :#{model_b.downcase}_id
     end
   end
 
   def self.down
-    drop_table :#{model_a.pluralize.downcase}_#{model_b.pluralize.downcase}
+    drop_table :#{first}_#{second}
   end
 end
 eos
