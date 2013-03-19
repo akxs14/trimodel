@@ -52,8 +52,8 @@ Part with the Assembly as the intermediate model, type:
   trimodel:new --models Car Assembly Part
 ```
 
-Note: The order you type the models is important.
------
+<b>Note:</b> The order you type the models is important.
+
 
 And in your code you get all the Parts by typing
 
