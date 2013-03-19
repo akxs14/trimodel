@@ -6,6 +6,9 @@ It will generate the needed migrations between the three given models, create th
 
 In case you change your mind it will rollback everything without leaving any trash in your app. 
 
+In contrast to using the has_many :through association, it doesn't 
+affect the existing database tables. Thus, regard it more as an 
+experiment.
 
 Setup
 =====

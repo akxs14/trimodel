@@ -62,6 +62,11 @@ module Trimodel
         "  has_and_belongs_to_many :#{model_b.pluralize.downcase}\n"
       end
 
+      def add_n_to_n_through_association bridge_model, target_model
+        assoc = "  has_and_belongs_to_many :#{target_model.pluralize.downcase},"
+        assoc << " :through => :#{bridge_model.pluralize.downcase}"
+      end
+
       def add_iterator_method bridge_model, target_model
         method_body=<<-eos
 
@@ -94,12 +99,14 @@ eos
         Time.now.utc.to_s.gsub('-','').gsub(':','').gsub(' ','')[0..-4]
       end
 
+      def set_model_order model_a, model_b
+        return (model_a.pluralize.downcase[0] < model_b.pluralize.downcase) ?
+           [model_a.pluralize.downcase, model_b.pluralize.downcase] :
+           [model_b.pluralize.downcase, model_a.pluralize.downcase]
+      end
+
       def write_migration_code model_a, model_b
-        if (model_a.pluralize.downcase[0] < model_b.pluralize.downcase)
-          first, second = model_a.pluralize.downcase, model_b.pluralize.downcase
-        else
-          first, second = model_b.pluralize.downcase, model_a.pluralize.downcase
-        end
+        first, second = *set_model_order(model_a, model_b)
         code=<<-eos
 class Create#{model_a.pluralize}#{model_b.pluralize}TrimodelJoinTable < ActiveRecord::Migration
   def self.up
