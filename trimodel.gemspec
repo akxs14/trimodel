@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name        = "trimodel"
-  s.version     = "0.0.1"
-  s.date        = "2013-03-12"
+  s.version     = "0.0.2"
+  s.date        = "2013-03-19"
   s.summary     = "A negotiator between 3 models"
   s.description = <<-eos
       A gem that enables transparent relationships 
