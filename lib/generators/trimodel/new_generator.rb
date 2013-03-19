@@ -31,7 +31,7 @@ module Trimodel
     end
 
     def create_trimodel_file
-      File.open(Rails.root.to_s + "/config/initializers/trimodel_#{options[:models][0]}_#{options[:models][1]}_#{options[:models][2]}.rb",
+      File.open(Rails.root.to_s + "/config/initializers/trimodel_#{options[:models][0].downcase}_#{options[:models][1].downcase}_#{options[:models][2].downcase}.rb",
         File::CREAT|File::RDWR) do |f|
           add_one_asoc_to_model f, options[:models][0], options[:models][1], options[:models][2]
           add_two_asocs_to_model f, options[:models][1], options[:models][0], options[:models][2]
