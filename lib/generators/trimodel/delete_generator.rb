@@ -27,7 +27,7 @@ module Trimodel
     end
 
     def delete_trimodel_file
-      File.delete(Rails.root.to_s + "/config/initializers/trimodel.rb")
+      File.delete(Rails.root.to_s + "/config/initializers/trimodel_#{options[:models][0]}_#{options[:models][1]}_#{options[:models][2]}.rb")
     end
 
     private
